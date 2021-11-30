@@ -371,28 +371,41 @@ public class VentanaRegistro extends JDialog implements ActionListener {
 			Object tratamiento = comboBox.getSelectedItem();
 			String diasHospitalizacion = txtCuantosDias.getText();
 			String costoMedicamentos = txtCostosMedica.getText();
-
-			// instanciamos clase
 			
-			// Pasamos datos al helper
-			helperDomain.getDatos(documento,nombre,direccion,telefono,nombreEmpresa,tipoOperario,tratamiento,diasHospitalizacion,costoMedicamentos);  
-			helperDomain.getProceso();
-			helperDomain.asignarDatosPaciente();
-			boolean registro = helperDomain.registrarPaciente();
-			// Si el registro es True entonces
-			if(registro){
-				// Mostramos los datos del paciente registrado
-				StringBuffer datos = helperDomain.mostrarDatosPaciente();
-				textArea.setText("Usuario Registrado");
-				textArea.setForeground(new Color(15,0,255));
-				System.out.println(datos);
-				JOptionPane.showMessageDialog(null, datos);
-				System.out.println("->Cantidad Pacientes Registrados :: "+helperDomain.cantidadPacientes());
-				
-			}else{
-				// Ya esta registrado
-				textArea.setText( "-Ya esta registrado-"+"\n\n"+":: Nombre = "+nombre+ "::\n:: Documento = "+documento+" ::");
-				textArea.setForeground(Color.RED);
+			// // Validamos datos
+			if (documento.isBlank()) {
+				JOptionPane.showMessageDialog(null, "Ingrese datos Correctamente!!");
+				return;
+			}
+			// Validamos que los datos ingresados sean numericos
+			if(!validacion(diasHospitalizacion, costoMedicamentos)){
+				JOptionPane.showMessageDialog(null, "|| ¡¡Ingrese Por favor Datos Numericos!! ||\nEn los campos:\n\t-> Dias Hospitalización\n\t-> Costos Medicamentos");
+			}
+
+			// 
+			try {
+				// Pasamos datos al helper
+				helperDomain.getDatos(documento,nombre,direccion,telefono,nombreEmpresa,tipoOperario,tratamiento,diasHospitalizacion,costoMedicamentos);  
+				helperDomain.getProceso();
+				helperDomain.asignarDatosPaciente();
+				boolean registro = helperDomain.registrarPaciente();
+				// Si el registro es True entonces
+				if(registro){
+					// Mostramos los datos del paciente registrado
+					StringBuffer datos = helperDomain.mostrarDatosPaciente();
+					textArea.setText("Usuario Registrado");
+					textArea.setForeground(new Color(15,0,255));
+					System.out.println(datos);
+					JOptionPane.showMessageDialog(null, datos);
+					System.out.println("->Cantidad Pacientes Registrados :: "+helperDomain.cantidadPacientes());
+					
+				}else{
+					// Ya esta registrado
+					textArea.setText( "-Ya esta registrado-"+"\n\n"+":: Nombre = "+nombre+ "::\n:: Documento = "+documento+" ::");
+					textArea.setForeground(Color.RED);
+				}
+			} catch (NullPointerException ex) {
+				JOptionPane.showMessageDialog(null, "No hay datos encontrados!!");
 			}
 		}
 
@@ -422,5 +435,17 @@ public class VentanaRegistro extends JDialog implements ActionListener {
 		
 		return "null";
 		// return tipo;
+	}
+
+	// Validamos que ingrese datos de tipo numericos 
+	public boolean validacion(String dias, String costroMedica){
+		// comvertimos los tipps de datos
+		try {
+			int diasHospi = Integer.parseInt(dias);
+			double costos = Double.parseDouble(costroMedica);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }
